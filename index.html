@@ -274,7 +274,7 @@
                         <i class="fas fa-check"></i>
                     </div>
                     <h3 class="font-serif text-xl text-gray-800 font-semibold mb-1">¡Gracias por responder!</h3>
-                    <p class="text-sm text-gray-600 mb-4">Tu confirmación ha sido guardada con éxito en nuestra lista de Google Sheets.</p>
+                    <p class="text-sm text-gray-600 mb-4">Tu confirmación ha sido guardada con éxito.</p>
                     
                     <div class="text-left bg-white/80 p-4 rounded-xl text-xs space-y-2 text-gray-600 border border-gold/20">
                         <p><strong>Nombre:</strong> <span id="savedName"></span></p>
@@ -287,42 +287,6 @@
                         Modificar respuesta
                     </button>
                 </div>
-
-                <!-- Configuración de Google Apps Script para los Organizadores -->
-                <div class="mt-8 pt-6 border-t border-gold/20">
-                    <button onclick="toggleConfigPanel()" class="text-xs text-gray-500 hover:text-dustyRose flex items-center gap-1.5 mx-auto transition-colors">
-                        <i class="fas fa-cog"></i>
-                        <span>Configurar conexión con Google Sheets (Organizador)</span>
-                    </button>
-
-                    <div id="configPanel" class="hidden mt-4 bg-white/90 p-5 rounded-2xl border border-gold/30 text-xs text-gray-600 space-y-4">
-                        <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Configuración de Google Sheets Web App</h4>
-                        <p>Ingresa la URL del script desplegado desde tu Google Apps Script:</p>
-                        
-                        <div class="flex gap-2">
-                            <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:border-dustyRose">
-                            <button onclick="saveScriptUrl()" class="bg-dustyRose text-white px-4 py-2 rounded-lg font-semibold hover:bg-softPink transition-colors">Guardar</button>
-                        </div>
-
-                        <!-- Instructivo Desplegable Paso a Paso -->
-                        <details class="cursor-pointer bg-pastelPink/20 p-3 rounded-xl border border-softPink/40">
-                            <summary class="font-semibold text-dustyRose">Guía Paso a Paso para Conectar Google Sheets (3 pasos)</summary>
-                            <div class="mt-3 space-y-2 text-gray-700 leading-relaxed text-[11px]">
-                                <p><strong>Paso 1:</strong> Crea una hoja en <a href="https://sheets.google.com" target="_blank" class="underline text-dustyRose">Google Sheets</a> y en la primera fila agrega las cabeceras: <code>Fecha</code>, <code>Nombre</code>, <code>Asistirá</code>, <code>Acompañantes</code>, <code>Mensaje</code>.</p>
-                                <p><strong>Paso 2:</strong> Ve al menú arriba en <strong>Extensiones > Apps Script</strong>, borra el código actual y pega este script:</p>
-                                <pre class="bg-gray-800 text-green-300 p-2.5 rounded-lg overflow-x-auto my-2 text-[10px]">function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  sheet.appendRow([new Date(), data.name, data.status, data.attendees, data.message]);
-  return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
-    .setMimeType(ContentService.MimeType.JSON);
-}</pre>
-                                <p><strong>Paso 3:</strong> Haz clic arriba en <strong>Implementar > Nueva implementación</strong>. Selecciona Tipo: <em>Aplicación Web</em>, en "Quién tiene acceso" selecciona <strong>Cualquier persona (Anyone)</strong>. Haz clic en <em>Implementar</em>, autoriza los permisos y copia la URL proporcionada para pegarla arriba.</p>
-                            </div>
-                        </details>
-                    </div>
-                </div>
-
             </div>
         </div>
     </section>
@@ -335,7 +299,7 @@
             </div>
             <h3 class="font-serif text-2xl font-bold text-gray-800 mb-2">¡Confirmación Guardada!</h3>
             <p class="text-gray-600 text-sm mb-6">
-                Tu respuesta se ha registrado exitosamente en nuestra lista de Google Sheets. ¡Nos emociona mucho compartir este momento especial contigo!
+                Tu respuesta se ha registrado exitosamente. ¡Nos emociona mucho compartir este momento especial contigo!
             </p>
             <button onclick="closeModal()" class="w-full bg-dustyRose text-white font-medium py-3 rounded-xl shadow-md hover:bg-softPink transition-colors">
                 Cerrar
@@ -351,8 +315,8 @@
 
     <!-- Script Principal -->
     <script>
-        // --- CONSTANTE GOOGLE SCRIPT URL DE RESPALDO/PREDETERMINADA ---
-        let GOOGLE_SHEET_SCRIPT_URL = localStorage.getItem('babyShower_scriptUrl') || "";
+        // --- CONSTANTE GOOGLE SCRIPT URL INTEGRADA DIRECTAMENTE ---
+        const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbOo46pJoQ0DQ2DrhZfKGgzfOOAPPed_BG7wAVFFXRV7f94ll-x-55v-PZUTGIE1R2LA/exec";
 
         // --- EFECTO VISUAL DE MARIPOSAS VOLANDO DE FONDO ---
         const bCanvas = document.getElementById('butterflyCanvas');
@@ -421,7 +385,7 @@
                 bCtx.fill();
                 bCtx.restore();
 
-                // Cuerpito suave
+                // Cuerpito
                 bCtx.fillStyle = '#A88B91';
                 bCtx.beginPath();
                 bCtx.ellipse(0, 0, 1, this.size * 0.4, 0, 0, Math.PI * 2);
@@ -519,22 +483,7 @@
             }
         }
 
-        // --- CONFIGURACIÓN DE SCRIPT URL ---
-        function toggleConfigPanel() {
-            const panel = document.getElementById('configPanel');
-            panel.classList.toggle('hidden');
-            document.getElementById('scriptUrlInput').value = GOOGLE_SHEET_SCRIPT_URL;
-        }
-
-        function saveScriptUrl() {
-            const val = document.getElementById('scriptUrlInput').value.trim();
-            GOOGLE_SHEET_SCRIPT_URL = val;
-            localStorage.setItem('babyShower_scriptUrl', val);
-            alert("URL de Google Sheets guardada correctamente.");
-            document.getElementById('configPanel').classList.add('hidden');
-        }
-
-        // --- LÓGICA DE RSVP (GOOGLE SHEETS + LOCALSTORAGE) ---
+        // --- LÓGICA DE RSVP (ENVÍO A GOOGLE SHEETS) ---
         async function handleRSVP(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
@@ -550,7 +499,6 @@
             submitBtn.disabled = true;
             spinner.classList.remove('hidden');
 
-            // Envío a Google Sheets en segundo plano si la URL existe
             if (GOOGLE_SHEET_SCRIPT_URL) {
                 try {
                     await fetch(GOOGLE_SHEET_SCRIPT_URL, {
@@ -656,7 +604,7 @@
             setInterval(update, 1000);
         }
 
-        // --- EFECTO CONFETI (AL CONFIRMAR ASISTENCIA) ---
+        // --- EFECTO CONFETI ---
         const cCanvas = document.getElementById('confettiCanvas');
         const cCtx = cCanvas.getContext('2d');
         let particles = [];
